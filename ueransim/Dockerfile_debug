@@ -47,9 +47,13 @@ RUN apt-get update && \
         cmake
 
 # Clone and build UERANSIM
-RUN git clone https://github.com/aligungr/UERANSIM && \
-    cd UERANSIM && git checkout  528061fe10389876da58d3bd15e8cba6d7c152a9 && \
+# JSM
+COPY UERANSIM/ /UERANSIM
+RUN cd UERANSIM && \
     make -j`nproc`
+#RUN git clone https://github.com/aligungr/UERANSIM && \
+#    cd UERANSIM && git checkout 384636f4fcf46b8c86109790ff3e2cd242b53556 && \
+#    make -j`nproc`
 
 # Build final image
 FROM ubuntu:jammy
@@ -65,8 +69,13 @@ RUN apt-get update && \
         netbase \
         ifupdown \
         net-tools \
+        gdb \
+        gdbserver \
         iputils-ping && \
     apt-get autoremove -y && apt-get autoclean
+
+# JSM
+COPY UERANSIM/ /UERANSIM
 
 COPY --from=builder /UERANSIM/build /UERANSIM/build
 COPY --from=builder /UERANSIM/config /UERANSIM/config
